@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--在这里配置好EmployeeMapper位置-->
+<mapper namespace="com.xcc.dao.EmployeeMapper">
+
+    <!-- 自定义结果集第二种方式
+        association可以指定联合javabean对象
+        property指定那个属性是联合的对象即外键
+        javaType不能省略，指定这个属性对象的类型
+    -->
+    <resultMap id="employeeResult" type="com.xcc.pojo.Employee">
+        <id column="id" property="id"/>
+        <result column="lastname" property="lastName"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <result column="birth" property="birth"/>
+        <association property="department" javaType="com.xcc.pojo.Department">
+            <id column="d_id" property="id"/>
+            <result column="d_name" property="departmentName"/>
+        </association>
+    </resultMap>
+
+    <!--使用级联属性-->
+    <select id="getEmployee" resultMap="employeeResult">
+        SELECT e.id id,e.lastname,e.email,e.gender,e.birth,dep.id d_id,dep.departmentName d_name
+        FROM employee e,department dep
+        WHERE e.departmentid=dep.id
+    </select>
+
+    <select id="getEmployeeById" resultMap="employeeResult">
+        SELECT e.id id,e.lastname,e.email,e.gender,e.birth,dep.id d_id,dep.departmentName d_name
+        FROM employee e,department dep
+        WHERE e.departmentid=dep.id and e.id = #{id}
+    </select>
+
+        <insert id="save" parameterType="Employee">
+            insert into school.employee values(#{id}, #{lastName}, #{email},#{gender}, #{department.id}, #{birth})
+        </insert>
+
+        <update id="updateEmployee" parameterType="Employee">
+            update school.employee set lastname = #{lastName}, email = #{email}, gender = #{gender},departmentid=#{department.id}, birth = #{birth} where id = #{id}
+        </update>
+
+        <delete id="delEmployeeById" parameterType="int">
+            delete from school.employee where id = #{id}
+        </delete>
+
+</mapper>
